@@ -9,7 +9,7 @@ client.login("MzM1NTkyMjk0NzA5MzI5OTM3.DEsAQQ.7FgTRnrlgL8rr0ASQGm47sgYA4A");
 
 //Game lists
 var listOfGames = [];
-
+var bot_msg = "";
 //Client Start notifications
 client.on("ready", () => {
   console.log("===READY===");
@@ -21,7 +21,7 @@ client.on("message", (message) => {
   // Exit and stop if the prefix is not there or if user is a bot
   if (!message.content.startsWith(prefix) || message.author.bot) return;
   //join game
-  if(message.content.startsWith(prefix+"join")){
+/*  if(message.content.startsWith(prefix+"join")){
     const args = message.content.split(/\s+/g).slice(2);
     var gc = args[0];
     if (gc.length>3||gc.length<3){
@@ -57,15 +57,20 @@ client.on("message", (message) => {
     else{
       message.channel.send("Invalid Game Code");
     }
-  }
+  }*/
   //User request to amend
-  if(message.content.startsWith(prefix+"amend")){
+  if(message.content.startsWith(prefix+"join")){
     const args = message.content.split(/\s+/g).slice(2);
     var gc = args[0]
-    var result = amend(message.author.id, gc);
-    if(result == 0)
-      message.channel.send("Name already exists!");
-    else if(result == 1||result == 2){
+    if (gc.length>3||gc.length<3){
+      message.channel.send("Invalid Game Code").then((sent_message)=>{sent_message.delete(5000)});
+      console.log("length error")
+    }
+    else if (/\d/.test(gc)&&gc.match(/([A-Za-z])/g)){
+      var result = amend(message.author.id, gc);
+    //if(result == 0)
+      //message.channel.send("Name already exists!");
+    if(result == 1||result == 2){
       var msg = ""
       for(var i=0;i<listOfGames.length;i++){
         msg += "\n\n **ID: "+listOfGames[i][0]+" ("+(listOfGames[i].length-1)+" player(s))**";
@@ -73,29 +78,34 @@ client.on("message", (message) => {
           msg+="\n"+j+". <@"+listOfGames[i][j]+">";
         }
     }
-      message.channel.send("<@"+message.author.id+"> has successfully moved to game code "+gc+"\n");
+      message.channel.send("<@"+message.author.id+"> has joined game "+gc+"\n").then((sent_message)=>{sent_message.delete(5000)});
+      //if (bot_msg == ""){
       message.channel.send({embed: {
         title: "**Current Servers**",
         color: 3447003,
         description: msg
-      }});
-    }
+      }}).then((sent_message)=>{message.delete(5000);
+    });
+  }
     //else if(result == 3)
       //message.channel.send("Game code doesn't exist!");
   }
+  else{
+    message.channel.send("Invalid Game Code").then((sent_message)=>{sent_message.delete(5000)});
+  }
+}
   //Reset servers
   if(message.content.startsWith(prefix+"reset")){
     //Check if user has the role Admin
     if(message.member.roles.find("name", "Admin")){
       listOfGames = [];
-      message.channel.send("All game codes have been reset.");
+      message.channel.send("All game codes have been reset.").then((sent_message)=>{sent_message.delete(5000)});;
     }
     else{
-      message.channel.send("You do not have permission to use this command");
+      message.channel.send("You do not have permission to use this command").then((sent_message)=>{sent_message.delete(5000)});;
     }
+      message.delete(5000);
   }
-
-
 });
 //Check if game code exists
 function checkExist(gamecode){
@@ -109,6 +119,10 @@ function checkExist(gamecode){
   }
 }
 
+function setMessage(msg){
+  bot_msg = msg;
+
+}
 //Add a new game code function
 function addGame(gamecode, playerName){
   var newGame = [gamecode, playerName];
