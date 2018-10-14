@@ -84,7 +84,7 @@ client.on("message", (message) => {
         title: "**Current Servers**",
         color: 3447003,
         description: msg
-      }}).then((sent_message)=>{message.delete(5000);
+      }}).then((sent_message)=>{;
     });
   }
     //else if(result == 3)
@@ -93,6 +93,7 @@ client.on("message", (message) => {
   else{
     message.channel.send("Invalid Game Code").then((sent_message)=>{sent_message.delete(5000)});
   }
+  message.delete(5000);
 }
   //Reset servers
   if(message.content.startsWith(prefix+"reset")){
