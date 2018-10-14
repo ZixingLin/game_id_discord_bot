@@ -61,7 +61,8 @@ client.on("message", (message) => {
   //User request to amend
   if(message.content.startsWith(prefix+"join")){
     const args = message.content.split(/\s+/g).slice(2);
-    var gc = args[0]
+    var gc = args[0];
+    var playerCount = 0;
     if (gc.length>3||gc.length<3){
       message.channel.send("Invalid Game Code").then((sent_message)=>{sent_message.delete(5000)});
       console.log("length error")
@@ -76,6 +77,7 @@ client.on("message", (message) => {
         msg += "\n\n **ID: "+listOfGames[i][0]+" ("+(listOfGames[i].length-1)+" player(s))**";
         for (var j=1;j<listOfGames[i].length;j++){
           msg+="\n"+j+". <@"+listOfGames[i][j]+">";
+          playerCount++;
         }
     }
       message.channel.send("<@"+message.author.id+"> has joined game "+gc+"\n").then((sent_message)=>{sent_message.delete(5000)});
@@ -83,7 +85,10 @@ client.on("message", (message) => {
       message.channel.send({embed: {
         title: "**Current Servers**",
         color: 3447003,
-        description: msg
+        description: msg,
+        footer: {
+          text: "\nLive on "+listOfGames.length+" server(s) with "+playerCount+" player(s)"
+        }
       }}).then((sent_message)=>{;
     });
   }
