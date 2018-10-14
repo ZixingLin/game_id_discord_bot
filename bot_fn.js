@@ -9,7 +9,7 @@ client.login("MzM1NTkyMjk0NzA5MzI5OTM3.DEsAQQ.7FgTRnrlgL8rr0ASQGm47sgYA4A");
 
 //Game lists
 var listOfGames = [];
-//var numOfGames = 0;
+
 //Client Start notifications
 client.on("ready", () => {
   console.log("===READY===");
@@ -20,35 +20,6 @@ client.on("message", (message) => {
   let prefix = "-g ";
   // Exit and stop if the prefix is not there or if user is a bot
   if (!message.content.startsWith(prefix) || message.author.bot) return;
-
-//create game
-/*  if(message.content.startsWith(prefix+"create")){
-    const args = message.content.split(/\s+/g).slice(2);
-    //if gamecode arg does not fulfil the 3 chara requirement
-    var gc = args[0];
-    var listOfGameIDs = [];
-    for (var i=0;i<listOfGames.length;i++){
-      listOfGameIDs.push(listOfGames[i][0]);
-    }
-    if (gc.length>3||gc.length<3){
-      message.channel.send("Invalid Game Code")
-      console.log("length error")
-    }
-    else if(listOfGameIDs.includes(gc)){
-      message.channel.send("Game already exists! Use -g join to join an existing game")
-    }
-    //check if alphanumerical
-    else if(/\d/.test(gc)&&gc.match(/([A-Za-z])/g)){
-      var game = addGame(gc, message.author.id);
-      message.channel.send("Players in game "+game[0]+":");
-      for(var i=1;i<game.length;i++){
-        message.channel.send("\n<@"+game[i]+">");
-      }
-    }
-    else{
-      message.channel.send("Invalid Game Code");
-    }
-  }*/
   //join game
   if(message.content.startsWith(prefix+"join")){
     const args = message.content.split(/\s+/g).slice(2);
@@ -59,25 +30,26 @@ client.on("message", (message) => {
     }
     else if (/\d/.test(gc)&&gc.match(/([A-Za-z])/g)){
       var game = joinGame(gc, message.author.id);
+      //If the result of join game is 1 or 2
       if (game==1||game==2){
-        var msg=" ";// = "<@"+message.author.id+"> has joined game "+gc;
-        /*for(var i=1;i<game.length;i++){
-          msg+="\n"+i+". <@"+game[i]+">";
-        }*/
-
+        var msg=" ";
+        //Formulate the message with the list of players in each game
         for(var i=0;i<listOfGames.length;i++){
           msg += "\n\n **ID: "+listOfGames[i][0]+" ("+(listOfGames[i].length-1)+" player(s))**";
           for (var j=1;j<listOfGames[i].length;j++){
             msg+="\n"+j+". <@"+listOfGames[i][j]+">";
           }
       }
+      //Give notification that the user has joined a gamecode
       message.channel.send("<@"+message.author.id+"> has joined game "+gc)
+      //Send embed with the list of games and players
       message.channel.send({embed: {
   title: "**Current Servers**",
   color: 3447003,
   description: msg
 }});
       }
+      //If 0, it means the user already exists in the server
       else if(game==0){
         message.channel.send("Name already exists!")
       }
@@ -86,7 +58,7 @@ client.on("message", (message) => {
       message.channel.send("Invalid Game Code");
     }
   }
-
+  //User request to amend
   if(message.content.startsWith(prefix+"amend")){
     const args = message.content.split(/\s+/g).slice(2);
     var gc = args[0]
@@ -111,8 +83,9 @@ client.on("message", (message) => {
     //else if(result == 3)
       //message.channel.send("Game code doesn't exist!");
   }
-
+  //Reset servers
   if(message.content.startsWith(prefix+"reset")){
+    //Check if user has the role Admin
     if(message.member.roles.find("name", "Admin")){
       listOfGames = [];
       message.channel.send("All game codes have been reset.");
@@ -124,6 +97,7 @@ client.on("message", (message) => {
 
 
 });
+//Check if game code exists
 function checkExist(gamecode){
   for(var i=0; i<listOfGames.length;i++){
     if(listOfGames[i][0]==gamecode)
@@ -134,13 +108,15 @@ function checkExist(gamecode){
 
   }
 }
+
+//Add a new game code function
 function addGame(gamecode, playerName){
   var newGame = [gamecode, playerName];
   listOfGames.push(newGame);
   console.log("game added");
   return newGame;
 }
-
+//Join an existing game code function
 function joinGame(gamecode, playername){
   for(var i=0;i<listOfGames.length;i++){
     if(listOfGames[i][0]==gamecode){
@@ -156,12 +132,11 @@ function joinGame(gamecode, playername){
   var newGame = addGame(gamecode, playername);
   return 2;
 }
-
+//Amend game
 function amend(playername, gamecode){
   var removed = false;
   var result;
-  //if(!checkExist(gamecode))
-    //return 3;
+
   for(var i=0;i<listOfGames.length;i++){
     if(listOfGames[i].includes(playername)){
       listOfGames[i].splice( listOfGames[i].indexOf(playername), 1 );
